@@ -6,6 +6,7 @@ import React, { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/all";
 import { IoIosArrowDown } from "react-icons/io";
+import { ImMenu } from "react-icons/im";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -97,8 +98,8 @@ const Hero = () => {
       // scale:1.5,
       y: 3,
       delay: 1,
-      yoyo:true,
-      repeat:-1,
+      yoyo: true,
+      repeat: -1,
       duration: 0.7,
     });
 
@@ -165,16 +166,16 @@ const Hero = () => {
     tl.to(
       revealtextRef.current,
       {
-        opacity:1,
+        opacity: 1,
       },
       "<+0.05"
     );
     tl.to(
       ".lastMsg",
       {
-        opacity:1,
-        y:-25,
-        scale:0.9,
+        opacity: 1,
+        y: -25,
+        scale: 0.9,
       },
       "<"
     );
@@ -256,11 +257,13 @@ const Hero = () => {
               "radial-gradient(circle at 50% 95.625vh, rgb(255, 211, 127) 0vh, rgb(232, 65, 123) 50vh, rgb(112, 30, 101) 90vh, rgba(32, 31, 66, 0) 115.104vh)",
             opacity: 0,
           }}
-          className="font-bold text-center absolute left-1/2 top-3/8 z-10 -translate-x-1/2 bg-clip-text h-[150%]  overflow-hidden text-[4rem] lg:text-[6rem] leading-none text-transparent font-sans will-change-transform font-pop"
+          className="font-bold text-center absolute left-1/2 top-3/8 z-10 -translate-x-1/2 bg-clip-text h-[150%]  overflow-hidden text-[4rem] lg:text-[6rem] leading-none text-transparent font-sans will-change-transform cursor-default font-pop"
         >
           COMING <br /> MAY 26 <br /> 2026
-        </div> 
-          <h1 className="absolute left-1/2 -translate-x-1/2 font-pop top-14/20  lg:top-16/20 opacity-0 lastMsg text-white text-[0.9rem] lg:text-[1.6rem] z-10 uppercase font-semibold">finally completed this</h1>
+        </div>
+        <h1 className="absolute left-1/2 -translate-x-1/2 font-pop top-14/20  lg:top-16/20 opacity-0 lastMsg text-white text-[0.9rem] lg:text-[1.6rem] z-10 uppercase font-semibold">
+          finally completed this
+        </h1>
         {/* </ div> */}
         <div className="mockLogo  bg-black w-full h-60 absolute top-0 left-0 z- 11 hidden will-change-transform-opacity"></div>
 
@@ -283,6 +286,18 @@ const Hero = () => {
             height={50}
             className="object-cover absolute left-0 -top-10"
           />
+        </div>
+
+        <Image
+          src={"/viLogo.png"}
+          alt="vi logo"
+          width={35}
+          height={20}
+          className="object-cover cursor-pointer left-8 fixed lg:left-15 top-10 z-9999 invert brightness-0 "
+        />
+
+        <div>
+          <ImMenu className="object-cover cursor-pointer fixed  right-10 lg:right-15 top-12 z-9999 invert brightness-0 scale-210" />
         </div>
 
         <div
@@ -324,10 +339,6 @@ const Hero = () => {
           </div>
         </div>
       </div>
-      <div>
-        <div className="z-5 ">{/* <BlackGradient /> */}</div>
-      </div>
-      <div></div>
     </div>
   );
 };
