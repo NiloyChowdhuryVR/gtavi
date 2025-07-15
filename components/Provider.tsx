@@ -10,7 +10,7 @@ const Provider = ({ children }: { children: React.ReactNode }) => {
     
       // smoothWheel:true,
     });
-    function raf(time: any) {
+    function raf(time: DOMHighResTimeStamp) {
       lenis.raf(time);
       requestAnimationFrame(raf);
     }

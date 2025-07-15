@@ -14,7 +14,6 @@ const Hero = () => {
   const imageRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLImageElement>(null);
   const overlayRef = useRef<SVGGElement | null>(null);
-  const playRef = useRef<HTMLImageElement>(null);
   const smokeRef = useRef<HTMLDivElement>(null);
   const revealtextRef = useRef<HTMLDivElement>(null);
   const viRef = useRef<HTMLImageElement>(null);
