@@ -5,7 +5,7 @@ import Image from "next/image";
 import React, { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/all";
-import { logoData } from "./constants/logo";
+import { IoIosArrowDown } from "react-icons/io";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,60 +14,207 @@ const Hero = () => {
   const imageRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLImageElement>(null);
   const overlayRef = useRef<SVGGElement | null>(null);
-  
-  const scale = 0.13;
-  const yTranslate = 200;
-  const CENTER_X = (2200 - 2200 * scale) / 2 ;
+  const playRef = useRef<HTMLImageElement>(null);
+  const smokeRef = useRef<HTMLDivElement>(null);
+  const revealtextRef = useRef<HTMLDivElement>(null);
+  const viRef = useRef<HTMLImageElement>(null);
+
+  const scale = 0.1;
+  const yTranslate = 250;
+  const CENTER_X = (2200 - 2200 * scale) / 2;
   const CENTER_Y = (800 - 800 * scale) / 2 - yTranslate;
   useGSAP(() => {
     if (!containerRef.current || !imageRef.current || !headingRef.current)
       return;
+
+    // gsap.to(revealtextRef.current, {
+    //   backgroundPositionY: -800,
+    //   fontSize:"6rem",
+    //   scrollTrigger: {
+    //     trigger: revealtextRef.current,
+    //     start: "top top",
+    //     end: "bottom top",
+    //     scrub: 1.2,
+    //   },
+    // });
+
+    const mm = gsap.matchMedia();
+
+    mm.add(
+      {
+        isXS: "(max-width: 639px)",
+        isSM: "(min-width: 640px) and (max-width: 767px)",
+        isMD: "(min-width: 768px) and (max-width: 1023px)",
+        isLG: "(min-width: 1024px) and (max-width: 1279px)",
+        isXL: "(min-width: 1280px) and (max-width: 1535px)",
+        is2XL: "(min-width: 1536px)",
+      },
+      (context) => {
+        const conditions = context.conditions as {
+          isXS?: boolean;
+          isSM?: boolean;
+          isMD?: boolean;
+          isLG?: boolean;
+          isXL?: boolean;
+          is2XL?: boolean;
+        };
+
+        let fontSize = "3rem"; // Default fallback
+
+        if (conditions.isXS) fontSize = "3rem";
+        else if (conditions.isSM) fontSize = "3rem";
+        else if (conditions.isMD) fontSize = "3rem";
+        else if (conditions.isLG) fontSize = "3rem";
+        else if (conditions.isXL) fontSize = "5rem";
+        else if (conditions.is2XL) fontSize = "5rem";
+
+        gsap.to(revealtextRef.current, {
+          backgroundPositionY: -800,
+          fontSize: fontSize,
+          scrollTrigger: {
+            trigger: revealtextRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: 0.8,
+          },
+        });
+      }
+    );
+
+    gsap.set(containerRef.current, {
+      transformOrigin: "top center",
+      scale: 1.1,
+      opacity: 0,
+    });
+
+    gsap.to(containerRef.current, {
+      scale: 1,
+      duration: 1,
+      opacity: 1,
+      ease: "power2.out",
+    });
+
+    gsap.to(".downArrow", {
+      // scale:1.5,
+      y: 3,
+      delay: 1,
+      yoyo:true,
+      repeat:-1,
+      duration: 0.7,
+    });
 
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
         end: "bottom top",
-        scrub: true,
+        scrub: 1,
         pin: true,
         pinSpacing: true,
       },
     });
 
-    
     // Animate image scaling down
     tl.fromTo(
       imageRef.current,
-      { scale: 1.2 },
-      { scale: 1, ease: "sine.inOut"}
+      { scale: 1.2, force3D: true },
+      { scale: 1, ease: "sine.inOut" }
     );
-    
+
     tl.fromTo(
       imageRef.current,
-      { opacity:1 },
-      { opacity : 0,duration:0.1},
+      { opacity: 1, force3D: true },
+      { opacity: 0, duration: 0.1 },
       "<+0.4"
     );
-    
+
     // Animate heading fading out
     tl.to(
-      headingRef.current,
+      [headingRef.current, ".disappear"],
       { opacity: 0, ease: "sine.inOut", duration: 0.3 },
       "0" // Start at same time as previous animation
     );
-    tl.fromTo(overlayRef.current,{
-      scale:50,y:-2500,transformOrigin:"center",ease:"sine.inOut",
-    },{
-            scale:scale,y:CENTER_Y,transformOrigin:"center",ease:"sine.inOut",
-    },"0");
+    tl.fromTo(
+      overlayRef.current,
+      {
+        scale: 50,
+        y: -2500,
+        transformOrigin: "center",
+        // ease: "power4.inOut",
+        force3D: true,
+      },
+      {
+        scale: scale,
+        y: CENTER_Y,
+        transformOrigin: "center",
+        // ease: "sine.inOut",
+        // duration:3,
+        force3D: true,
+      },
+      "0"
+    );
+
+    tl.to(
+      smokeRef.current,
+      {
+        display: "block",
+        top: -500,
+        // duration:0.8,
+      },
+      "<+0.47"
+    );
+    tl.to(
+      revealtextRef.current,
+      {
+        opacity:1,
+      },
+      "<+0.05"
+    );
+    tl.to(
+      ".lastMsg",
+      {
+        opacity:1,
+        y:-25,
+        scale:0.9,
+      },
+      "<"
+    );
+    tl.to(
+      ".mockLogo",
+      {
+        display: "block",
+        scale: 0.8,
+        y: 30,
+      },
+      "<-0.017"
+    );
+    tl.to(
+      ".bgLogo",
+      {
+        display: "block",
+        scale: 0.7,
+      },
+      "<+0.1"
+    );
+    tl.to(
+      viRef.current,
+      {
+        scale: 0.9,
+        y: 40,
+      },
+      "<"
+    );
   }, []);
 
   return (
     <div>
-      <div ref={containerRef} className="relative h-screen w-full bg-white">
+      <div
+        ref={containerRef}
+        className="relative will-change-transform-opacity h-[100svh] w-full bg-white"
+      >
         <div className="absolute inset-0 z-10 w-full h-full pointer-events-none">
           <svg
-            className="w-full h-full"
+            className="w-full h-full z-6"
             viewBox="0 0 2200 800"
             preserveAspectRatio="xMidYMid slice"
           >
@@ -76,6 +223,7 @@ const Hero = () => {
                 <rect width="100%" height="100%" fill="white" />
                 <g
                   ref={overlayRef}
+                  className="will-change-transform"
                   id="trialnoob"
                   transform={`translate(${CENTER_X},${CENTER_Y}) scale(${scale}) `}
                 >
@@ -94,7 +242,54 @@ const Hero = () => {
             />
           </svg>
         </div>
-        <div ref={imageRef} className="relative h-full w-full overflow-hidden">
+
+        <div
+          ref={smokeRef}
+          className="absolute hidden top-80 w-full h-130 bg-gradient-to-b from-black to-black blur-3xl pointer-events-none z-11 will-change-transform"
+        />
+        {/* <div className="w-full h-full absolute left-0 top-0 z-10"> */}
+
+        <div
+          ref={revealtextRef}
+          style={{
+            backgroundPositionY: 0,
+            backgroundImage:
+              "radial-gradient(circle at 50% 95.625vh, rgb(255, 211, 127) 0vh, rgb(232, 65, 123) 50vh, rgb(112, 30, 101) 90vh, rgba(32, 31, 66, 0) 115.104vh)",
+            opacity: 0,
+          }}
+          className="font-bold text-center absolute left-1/2 top-3/8 z-10 -translate-x-1/2 bg-clip-text h-[150%]  overflow-hidden text-[4rem] lg:text-[6rem] leading-none text-transparent font-sans will-change-transform font-pop"
+        >
+          COMING <br /> MAY 26 <br /> 2026
+        </div> 
+          <h1 className="absolute left-1/2 -translate-x-1/2 font-pop top-14/20  lg:top-16/20 opacity-0 lastMsg text-white text-[0.9rem] lg:text-[1.6rem] z-10 uppercase font-semibold">finally completed this</h1>
+        {/* </ div> */}
+        <div className="mockLogo  bg-black w-full h-60 absolute top-0 left-0 z- 11 hidden will-change-transform-opacity"></div>
+
+        <div>
+          <Image
+            src={"/name-logo.svg"}
+            alt="logo"
+            width={204}
+            height={500}
+            className={`mockLogo will-change-transform-opacity absolute hidden left-[50.09865%] -translate-x-1/2 top-25 z-12`}
+          />
+        </div>
+
+        <div className="absolute left-[50%] -translate-x-1/2 top-20 w-50 h-30 z-10 hidden bgLogo will-change-transform-opacity">
+          <Image
+            ref={viRef}
+            src={"/viLogo.png"}
+            alt="vi logo"
+            width={200}
+            height={50}
+            className="object-cover absolute left-0 -top-10"
+          />
+        </div>
+
+        <div
+          ref={imageRef}
+          className="relative h-full w-full overflow-hidden will-change-transform-opacity"
+        >
           <Image
             src="/hero-img-trans.png"
             alt="heroimg"
@@ -107,7 +302,7 @@ const Hero = () => {
             alt="nameLogo"
             width={350}
             height={300}
-            className="z-1 absolute left-1/2 top-2/10 -translate-x-1/2"
+            className="z-1 will-change-transform-opacity absolute left-1/2 -translate-x-1/2 w-[15rem] top-7/30 sm:w-[23rem] sm:top-4/30 md:w-[30rem] md:top-6/30 lg:w-[20rem] lg:top-8/40 xl:w-[20rem] xl:top-8/40 2xl:w-[23rem] 2xl:top-6/50"
           />
           <Image
             src="/hero-img.jpg"
@@ -115,8 +310,25 @@ const Hero = () => {
             fill
             className="object-cover z-0"
           />
+          <Image
+            src={"/playButton.png"}
+            alt="playButton"
+            width={80}
+            height={80}
+            className="z-4 disappear will-change-transform-opacity absolute left-1/2 top-1/2 -translate-1/2 cursor-pointer hover:scale-110 transition-transform ease-in text-white"
+          />
+          <div className="disappear flex justify-center items-center flex-col gap-2 absolute left-1/2 -translate-x-1/2 bottom-20 z-12">
+            <h1 className="text-white text-xs uppercase font-pop">
+              Scroll down to see more!
+            </h1>
+            <IoIosArrowDown className="text-white downArrow scale-170" />
+          </div>
         </div>
       </div>
+      <div>
+        <div className="z-5 ">{/* <BlackGradient /> */}</div>
+      </div>
+      <div></div>
     </div>
   );
 };

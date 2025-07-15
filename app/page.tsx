@@ -5,7 +5,7 @@ const page = () => {
   return (
     <>
     <Hero/>
-    <div className='h-screen'>page</div>
+    <div className='h-screen bg-white'>page</div>
     </>
   )
 }
