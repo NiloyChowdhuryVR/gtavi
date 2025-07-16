@@ -18,6 +18,7 @@ const Hero = () => {
   const smokeRef = useRef<HTMLDivElement>(null);
   const revealtextRef = useRef<HTMLDivElement>(null);
   const viRef = useRef<HTMLImageElement>(null);
+  const finalSmokeRef = useRef<HTMLDivElement>(null);
 
   const scale = 0.1;
   const yTranslate = 250;
@@ -111,6 +112,18 @@ const Hero = () => {
         scrub: 1,
         pin: true,
         pinSpacing: true,
+        onUpdate: (self) => {
+          if (self.progress > 0.2) {
+            gsap.set(".disappear", { pointerEvents: "none" });
+          } else {
+            gsap.set(".disappear", { pointerEvents: "auto" });
+          }
+          if (self.progress > 0.5) {
+            gsap.set(revealtextRef.current, { pointerEvents: "auto" });
+          } else {
+            gsap.set(revealtextRef.current, { pointerEvents: "none" });
+          }
+        },
       },
     });
 
@@ -131,7 +144,14 @@ const Hero = () => {
     // Animate heading fading out
     tl.to(
       [headingRef.current, ".disappear"],
-      { opacity: 0, ease: "sine.inOut", duration: 0.3 },
+      {
+        opacity: 0,
+        ease: "sine.inOut",
+        duration: 0.3,
+        onComplete: () => {
+          gsap.set(".disappear", { pointerEvents: "none" });
+        },
+      },
       "0" // Start at same time as previous animation
     );
     tl.fromTo(
@@ -170,11 +190,12 @@ const Hero = () => {
       },
       "<+0.05"
     );
+    tl.add("testLabel");
     tl.to(
       ".lastMsg",
       {
         opacity: 1,
-        y: -25,
+        y: -30,
         scale: 0.9,
       },
       "<"
@@ -204,6 +225,10 @@ const Hero = () => {
       },
       "<"
     );
+    // tl.to(finalSmokeRef.current,{
+    //   y:-1000,
+    // },"testLabel+=10")
+
   }, []);
 
   return (
@@ -262,7 +287,7 @@ const Hero = () => {
           COMING <br /> MAY 26 <br /> 2026
         </div>
         <h1 className="absolute left-1/2 -translate-x-1/2 font-pop top-14/20  lg:top-16/20 opacity-0 lastMsg text-white text-[0.9rem] lg:text-[1.6rem] z-10 uppercase font-semibold">
-          finally completed this
+          keep waiting for this
         </h1>
         {/* </ div> */}
         <div className="mockLogo  bg-black w-full h-60 absolute top-0 left-0 z- 11 hidden will-change-transform-opacity"></div>
@@ -308,7 +333,7 @@ const Hero = () => {
             src="/hero-img-trans.png"
             alt="heroimg"
             fill
-            className="z-2 object-cover"
+            className="z-2 object-cover pointer-events-none"
           />
           <Image
             ref={headingRef}
@@ -322,22 +347,26 @@ const Hero = () => {
             src="/hero-img.jpg"
             alt="heroimg"
             fill
-            className="object-cover z-0"
+            className="object-cover z-0 pointer-events-none"
           />
           <Image
             src={"/playButton.png"}
             alt="playButton"
             width={80}
             height={80}
-            className="z-4 disappear will-change-transform-opacity absolute left-1/2 top-1/2 -translate-1/2 cursor-pointer hover:scale-110 transition-transform ease-in text-white"
+            className="z-2 disappear will-change-transform-opacity absolute left-1/2 top-1/2 -translate-1/2 cursor-pointer hover:scale-110 transition-transform ease-in text-white"
           />
           <div className="disappear flex justify-center items-center flex-col gap-2 absolute left-1/2 -translate-x-1/2 bottom-20 z-12">
             <h1 className="text-white text-xs uppercase font-pop">
               Scroll down to see more!
             </h1>
-            <IoIosArrowDown className="text-white downArrow scale-170" />
+            <IoIosArrowDown className="text-white cursor-pointer downArrow scale-170" />
           </div>
         </div>
+        <div
+          ref={finalSmokeRef}
+          className="absolute top-200 w-full h-180 bg-gradient-to-b from-yellow-300 to-black blur-3xl pointer-events-none z-15 will-change-transform"
+        />
       </div>
     </div>
   );
