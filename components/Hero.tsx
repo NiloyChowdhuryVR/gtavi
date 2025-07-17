@@ -18,7 +18,6 @@ const Hero = () => {
   const smokeRef = useRef<HTMLDivElement>(null);
   const revealtextRef = useRef<HTMLDivElement>(null);
   const viRef = useRef<HTMLImageElement>(null);
-  const finalSmokeRef = useRef<HTMLDivElement>(null);
 
   const scale = 0.1;
   const yTranslate = 250;
@@ -27,17 +26,6 @@ const Hero = () => {
   useGSAP(() => {
     if (!containerRef.current || !imageRef.current || !headingRef.current)
       return;
-
-    // gsap.to(revealtextRef.current, {
-    //   backgroundPositionY: -800,
-    //   fontSize:"6rem",
-    //   scrollTrigger: {
-    //     trigger: revealtextRef.current,
-    //     start: "top top",
-    //     end: "bottom top",
-    //     scrub: 1.2,
-    //   },
-    // });
 
     const mm = gsap.matchMedia();
 
@@ -225,10 +213,6 @@ const Hero = () => {
       },
       "<"
     );
-    // tl.to(finalSmokeRef.current,{
-    //   y:-1000,
-    // },"testLabel+=10")
-
   }, []);
 
   return (
@@ -363,10 +347,6 @@ const Hero = () => {
             <IoIosArrowDown className="text-white cursor-pointer downArrow scale-170" />
           </div>
         </div>
-        <div
-          ref={finalSmokeRef}
-          className="absolute top-200 w-full h-180 bg-gradient-to-b from-yellow-300 to-black blur-3xl pointer-events-none z-15 will-change-transform"
-        />
       </div>
     </div>
   );
