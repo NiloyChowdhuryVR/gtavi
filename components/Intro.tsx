@@ -6,6 +6,20 @@ import React, { useRef, useState, useEffect } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const preloadImages = (imageUrls: string[]): Promise<void> => {
+  return new Promise((resolve) => {
+    let loaded = 0;
+    imageUrls.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        loaded++;
+        if (loaded === imageUrls.length) resolve();
+      };
+    });
+  });
+};
+
 const Intro = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -23,7 +37,7 @@ const Intro = () => {
     const frames = mobile ? 20 : 60;
     setTotalFrames(frames);
 
-    const loadedImages = [];
+    const loadedImages: string[] = [];
     for (let i = 1; i <= frames; i++) {
       const padded = i.toString().padStart(4, "0");
       loadedImages.push(
@@ -31,11 +45,19 @@ const Intro = () => {
       );
     }
 
-    setImages(loadedImages);
+    preloadImages(loadedImages).then(() => {
+      setImages(loadedImages);
+    });
   }, []);
 
   useGSAP(() => {
-    if (!sectionRef.current || !imageRef.current || images.length === 0) return;
+    if (
+      !sectionRef.current ||
+      !imageRef.current ||
+      images.length === 0
+    )
+      return;
+
     gsap.to(headRef.current, {
       opacity: 1,
       duration: 3,
@@ -111,7 +133,7 @@ const Intro = () => {
         className="absolute inset-0 bg-black opacity-0 z-10"
       />
 
-      {/* Text (absolute inside relative section) */}
+      {/* Text */}
       <h1
         ref={headRef}
         className="absolute text-2xl lg:text-6xl font-extrabold z-20 top-8/10 lg:top-2/3 left-1/8 opacity-0 text-white leading-snug"
@@ -124,9 +146,14 @@ const Intro = () => {
       {/* Image */}
       <img
         ref={imageRef}
-        src={isMobile ? `/frames/frame_0001.jpg` : `/frame/frame_0001.jpg`}
+        src={
+          isMobile
+            ? `/frames/frame_0001.jpg`
+            : `/frame/frame_0001.jpg`
+        }
         className="w-full h-full object-cover object-[60%_center] will-change-transform z-0"
         alt="Scroll Animation"
+        loading="eager"
       />
     </div>
   );
