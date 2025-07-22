@@ -51,14 +51,14 @@ const Intro = () => {
       sectionRef.current,
       {
         scale: 0.9,
-        opacity:0,
+        opacity: 0,
         borderRadius: "50px",
-        transformOrigin:"top center"
+        transformOrigin: "top center",
       },
       {
-        scale:1,
-        opacity:1,
-        borderRadius:0,
+        scale: 1,
+        opacity: 1,
+        borderRadius: 0,
         scrollTrigger: {
           trigger: sectionRef.current,
           start: "top bottom",
@@ -116,9 +116,9 @@ const Intro = () => {
         ref={headRef}
         className="absolute text-2xl lg:text-6xl font-extrabold z-20 top-8/10 lg:top-2/3 left-1/8 opacity-0 text-white leading-snug"
       >
-        "If anything happens,
+        &quot;If anything happens,
         <br />
-        &nbsp; I'll run away before you."
+        &nbsp; I&apos;ll run away before you.&quot;
       </h1>
 
       {/* Image */}

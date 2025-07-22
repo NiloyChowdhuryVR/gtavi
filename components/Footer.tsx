@@ -1,33 +1,9 @@
 "use client";
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/all";
 import React, { useRef } from "react";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const Footer = () => {
   const innerRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-// useGSAP(() => {
-//   gsap.fromTo(
-//     containerRef.current,
-//     { scale: 1, borderRadius: "0px" }, // start
-//     {
-//       scale: 0.95,
-//       borderRadius: "50px",
-//       transformOrigin:"top center",
-//       scrollTrigger: {
-//         trigger: containerRef.current,
-//         start: "top center",
-//         end: "bottom top",
-//         scrub: 1,
-//         markers: true,
-//       },
-//     }
-//   );
-// }, []);
-
 
   return (
     
