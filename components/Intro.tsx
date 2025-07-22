@@ -15,6 +15,7 @@ const Intro = () => {
   const [images, setImages] = useState<string[]>([]);
   const [totalFrames, setTotalFrames] = useState(60);
   const [isMobile, setIsMobile] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
 
   useEffect(() => {
     const mobile = window.innerWidth < 768;
@@ -23,19 +24,45 @@ const Intro = () => {
     const frames = mobile ? 20 : 60;
     setTotalFrames(frames);
 
-    const loadedImages = [];
+    const loadedImages: string[] = [];
+    const preloadPromises: Promise<void>[] = [];
+
     for (let i = 1; i <= frames; i++) {
       const padded = i.toString().padStart(4, "0");
-      loadedImages.push(
-        mobile ? `/frames/frame_${padded}.jpg` : `/frame/frame_${padded}.jpg`
-      );
+      const src = mobile
+        ? `/frames/frame_${padded}.jpg`
+        : `/frame/frame_${padded}.jpg`;
+
+      loadedImages.push(src);
+
+      // Preload logic
+      const img = new Image();
+      img.src = src;
+
+      const promise = new Promise<void>((resolve) => {
+        img.onload = () => resolve();
+        img.onerror = () => resolve(); // Failsafe
+      });
+
+      preloadPromises.push(promise);
     }
 
-    setImages(loadedImages);
+    Promise.all(preloadPromises).then(() => {
+      setImages(loadedImages);
+      setImagesLoaded(true);
+    });
   }, []);
 
   useGSAP(() => {
-    if (!sectionRef.current || !imageRef.current || images.length === 0) return;
+    if (
+      !sectionRef.current ||
+      !imageRef.current ||
+      images.length === 0 ||
+      !imagesLoaded
+    )
+      return;
+
+    // Animate headline fade-in
     gsap.to(headRef.current, {
       opacity: 1,
       duration: 3,
@@ -47,6 +74,7 @@ const Intro = () => {
       },
     });
 
+    // Animate zoom and border-radius
     gsap.fromTo(
       sectionRef.current,
       {
@@ -68,6 +96,7 @@ const Intro = () => {
       }
     );
 
+    // Animate overlay fade
     gsap.to(jasonOpacityRef.current, {
       opacity: 0.4,
       duration: 3,
@@ -79,8 +108,8 @@ const Intro = () => {
       },
     });
 
+    // Scroll frame animation
     const obj = { frame: 0 };
-
     gsap.to(obj, {
       frame: totalFrames - 1,
       ease: "none",
@@ -98,7 +127,7 @@ const Intro = () => {
         }
       },
     });
-  }, [images]);
+  }, [images, imagesLoaded]);
 
   return (
     <div
@@ -111,7 +140,7 @@ const Intro = () => {
         className="absolute inset-0 bg-black opacity-0 z-10"
       />
 
-      {/* Text (absolute inside relative section) */}
+      {/* Text */}
       <h1
         ref={headRef}
         className="absolute text-2xl lg:text-6xl font-extrabold z-20 top-8/10 lg:top-2/3 left-1/8 opacity-0 text-white leading-snug"
@@ -121,10 +150,12 @@ const Intro = () => {
         &nbsp; I&apos;ll run away before you.&quot;
       </h1>
 
-      {/* Image */}
+      {/* Initial Frame Image */}
       <img
         ref={imageRef}
-        src={isMobile ? `/frames/frame_0001.jpg` : `/frame/frame_0001.jpg`}
+        src={
+          isMobile ? `/frames/frame_0001.jpg` : `/frame/frame_0001.jpg`
+        }
         className="w-full h-full object-cover object-[60%_center] will-change-transform z-0"
         alt="Scroll Animation"
       />
