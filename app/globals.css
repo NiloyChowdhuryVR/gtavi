@@ -37,3 +37,4 @@ body {
 .font-pop{
   font-family: var(--font-poppins), sans-serif; /* Add a fallback font */
 }
+

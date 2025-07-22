@@ -2,7 +2,7 @@ import React from "react";
 
 const Info = () => {
   return (
-    <div className=" flex justify-center items-center py-20 w-full bg-black relative -top-1 overflow-hidden">
+    <div className=" flex justify-center h-full items-center py-20 w-full bg-black relative -top-1 overflow-hidden">
       <div
         className=" 
         bg-clip-text text-transparent 

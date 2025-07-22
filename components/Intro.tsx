@@ -4,77 +4,130 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/all";
 import React, { useRef, useState, useEffect } from "react";
 
-// Register ScrollTrigger with GSAP so we can use scroll-based animations
 gsap.registerPlugin(ScrollTrigger);
 
-// Change: now we have 60 frames
-const TOTAL_FRAMES = 60;
-
 const Intro = () => {
-  // `sectionRef` refers to the scrollable section we want to animate
   const sectionRef = useRef<HTMLDivElement>(null);
-
-  // `imageRef` refers to the <img> tag where we will update the `src` dynamically
   const imageRef = useRef<HTMLImageElement>(null);
+  const headRef = useRef<HTMLHeadingElement>(null);
+  const jasonOpacityRef = useRef<HTMLDivElement>(null);
 
-  // React state to store all image URLs we’ll use for scroll animation
   const [images, setImages] = useState<string[]>([]);
+  const [totalFrames, setTotalFrames] = useState(60);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // ✅ Load all 60 images into the state when the component mounts
   useEffect(() => {
-    const loadedImages = [];
+    const mobile = window.innerWidth < 768;
+    setIsMobile(mobile);
 
-    for (let i = 1; i <= TOTAL_FRAMES; i++) {
-      // Pad the number with leading zeroes to match the filename format: frame_0001.jpg
+    const frames = mobile ? 20 : 60;
+    setTotalFrames(frames);
+
+    const loadedImages = [];
+    for (let i = 1; i <= frames; i++) {
       const padded = i.toString().padStart(4, "0");
-      // ✅ Folder is now `/frame` (not `/frames`)
-      loadedImages.push(`/frame/frame_${padded}.jpg`);
+      loadedImages.push(
+        mobile ? `/frames/frame_${padded}.jpg` : `/frame/frame_${padded}.jpg`
+      );
     }
 
     setImages(loadedImages);
   }, []);
 
-  // ✅ Scroll animation using GSAP
   useGSAP(() => {
-    // Abort if references aren't ready or images not loaded yet
     if (!sectionRef.current || !imageRef.current || images.length === 0) return;
+    gsap.to(headRef.current, {
+      opacity: 1,
+      duration: 3,
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "top top",
+        end: "bottom top",
+        scrub: true,
+      },
+    });
 
-    // This object will have a property `frame` that GSAP will animate
+    gsap.fromTo(
+      sectionRef.current,
+      {
+        scale: 0.9,
+        opacity:0,
+        borderRadius: "50px",
+        transformOrigin:"top center"
+      },
+      {
+        scale:1,
+        opacity:1,
+        borderRadius:0,
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top bottom",
+          end: "top top",
+          scrub: 1,
+        },
+      }
+    );
+
+    gsap.to(jasonOpacityRef.current, {
+      opacity: 0.4,
+      duration: 3,
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "top top",
+        end: "bottom top",
+        scrub: true,
+      },
+    });
+
     const obj = { frame: 0 };
 
     gsap.to(obj, {
-      frame: TOTAL_FRAMES - 1, // Animate from 0 to 59
-      ease: "none", // Linear interpolation
+      frame: totalFrames - 1,
+      ease: "none",
       scrollTrigger: {
-        trigger: sectionRef.current, // Triggered when this section enters viewport
-        start: "top top", // Start when top of section hits top of screen
-        end: "bottom top", // End when bottom of section hits top of screen
-        scrub: true, // Smooth scroll sync
-        pin: true, // Pin the section while animation is active
+        trigger: sectionRef.current,
+        start: "top top",
+        end: "bottom top",
+        scrub: true,
+        pin: true,
       },
       onUpdate: () => {
         const currentFrame = Math.round(obj.frame);
         if (imageRef.current && images[currentFrame]) {
-          imageRef.current.src = images[currentFrame]; // Update image
+          imageRef.current.src = images[currentFrame];
         }
       },
     });
-  }, [images]); // This re-runs when `images` is updated
+  }, [images]);
 
   return (
-    <div className="h-[200vh] overflow-x-hidde">
+    <div
+      ref={sectionRef}
+      className="h-screen w-full bg-black flex items-center justify-center relative overflow-hidden"
+    >
+      {/* Overlay */}
       <div
-        ref={sectionRef}
-        className="h-screen w-full bg-black flex items-center justify-center"
+        ref={jasonOpacityRef}
+        className="absolute inset-0 bg-black opacity-0 z-10"
+      />
+
+      {/* Text (absolute inside relative section) */}
+      <h1
+        ref={headRef}
+        className="absolute text-2xl lg:text-6xl font-extrabold z-20 top-8/10 lg:top-2/3 left-1/8 opacity-0 text-white leading-snug"
       >
-        {/* Default frame to show before animation kicks in */}
-        <img
-          ref={imageRef}
-          src="/frame/frame_0001.jpg" // ✅ Start frame updated to `/frame`
-          className="w-full h-full object-cover object-[60%_center]"
-          alt="Scroll Animation"
-        />
-      </div>
+        "If anything happens,
+        <br />
+        &nbsp; I'll run away before you."
+      </h1>
+
+      {/* Image */}
+      <img
+        ref={imageRef}
+        src={isMobile ? `/frames/frame_0001.jpg` : `/frame/frame_0001.jpg`}
+        className="w-full h-full object-cover object-[60%_center] will-change-transform z-0"
+        alt="Scroll Animation"
+      />
     </div>
   );
 };

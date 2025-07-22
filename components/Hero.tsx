@@ -213,13 +213,14 @@ const Hero = () => {
       },
       "<"
     );
+
   }, []);
 
   return (
     <div>
       <div
         ref={containerRef}
-        className="relative will-change-transform-opacity h-[100svh] w-full bg-white "
+        className="relative will-change-transform-opacity h-[100svh] w-full bg-white"
       >
         <div className="absolute inset-0 z-10 w-full h-full pointer-events-none">
           <svg
