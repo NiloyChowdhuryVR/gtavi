@@ -58,7 +58,7 @@ const Preloader = ({
   return (
     <div
       ref={containerRef}
-      className="h-screen absolute left-0 top-0 flex justify-center items-center w-full bg-gradient-to-r from-fuchsia-600 to-pink-600 z-[999999] text-white overflow-hidden"
+      className="h-screen fixed left-0 top-0 flex justify-center items-center w-full bg-gradient-to-r from-fuchsia-600 to-pink-600 z-[999999] text-white overflow-hidden"
     >
       <h1
         ref={textRef}
