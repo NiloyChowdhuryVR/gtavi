@@ -52,7 +52,7 @@ const Hero = () => {
 
         if (conditions.isXS) fontSize = "3rem";
         else if (conditions.isSM) fontSize = "3rem";
-        else if (conditions.isMD) fontSize = "3rem";
+        else if (conditions.isMD) fontSize = "5rem";
         else if (conditions.isLG) fontSize = "3rem";
         else if (conditions.isXL) fontSize = "5rem";
         else if (conditions.is2XL) fontSize = "5rem";
@@ -275,7 +275,7 @@ const Hero = () => {
           keep waiting for this
         </h1>
         {/* </ div> */}
-        <div className="mockLogo  bg-black w-full h-60 absolute top-0 left-0 z- 11 hidden will-change-transform-opacity"></div>
+        <div className="mockLogo  bg-black w-full h-100 absolute top-0 left-0 z- 11 hidden will-change-transform-opacity"></div>
 
         <div>
           <Image

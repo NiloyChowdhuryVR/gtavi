@@ -11,19 +11,8 @@ const Intro: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const headRef = useRef<HTMLHeadingElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
-
   const [videoDuration, setVideoDuration] = useState(1);
-  const [videoSrc, setVideoSrc] = useState("/trial_optimized.mp4");
-  const [isMobile, setIsMobile] = useState(false);
 
-  // Detect mobile on mount
-  useEffect(() => {
-    const mobile = /Mobi|Android/i.test(navigator.userAgent);
-    setIsMobile(mobile);
-    setVideoSrc(mobile ? "/trial_optimized_mobile.mp4" : "/trial_optimized.mp4");
-  }, []);
-
-  // Load video duration
   useEffect(() => {
     const videoEl = videoRef.current;
     if (!videoEl) return;
@@ -36,7 +25,7 @@ const Intro: React.FC = () => {
     return () => {
       videoEl.removeEventListener("loadedmetadata", handleLoadedMetadata);
     };
-  }, [videoSrc]);
+  }, []);
 
   useGSAP(() => {
     const section = sectionRef.current;
@@ -82,7 +71,7 @@ const Intro: React.FC = () => {
         start: "top top",
         end: "bottom top",
         scrub: true,
-        pin: isMobile ? false : true, // disable pin on mobile for performance
+        pin: true,
       },
       onUpdate: () => {
         if (rafId) return;
@@ -94,7 +83,7 @@ const Intro: React.FC = () => {
         });
       },
     });
-  }, [videoDuration, isMobile]);
+  }, [videoDuration]);
 
   return (
     <div
@@ -120,17 +109,12 @@ const Intro: React.FC = () => {
       {/* Video */}
       <video
         ref={videoRef}
-        src={videoSrc}
+        src="/trial_optimized.mp4"
         className="w-full h-full object-cover object-center will-change-auto z-0"
         preload="auto"
         playsInline
         muted
-        style={{
-          pointerEvents: "none",
-          willChange: "transform",
-          transform: "translateZ(0)",
-          backfaceVisibility: "hidden",
-        }}
+        style={{ pointerEvents: "none", willChange: "transform", transform: "translateZ(0)", backfaceVisibility: "hidden" }}
       />
     </div>
   );
