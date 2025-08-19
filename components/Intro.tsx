@@ -1,133 +1,100 @@
 "use client";
+import React, { useRef, useEffect, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/all";
-import React, { useRef, useState, useEffect } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Intro = () => {
+const Intro: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const headRef = useRef<HTMLHeadingElement>(null);
-  const jasonOpacityRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
-  const [images, setImages] = useState<string[]>([]);
-  const [totalFrames, setTotalFrames] = useState(60);
+  const [videoDuration, setVideoDuration] = useState(1);
+  const [videoSrc, setVideoSrc] = useState("/trial_optimized.mp4");
   const [isMobile, setIsMobile] = useState(false);
-  const [imagesLoaded, setImagesLoaded] = useState(false);
 
+  // Detect mobile on mount
   useEffect(() => {
-    const mobile = window.innerWidth < 768;
+    const mobile = /Mobi|Android/i.test(navigator.userAgent);
     setIsMobile(mobile);
-
-    const frames = mobile ? 20 : 60;
-    setTotalFrames(frames);
-
-    const loadedImages: string[] = [];
-    const preloadPromises: Promise<void>[] = [];
-
-    for (let i = 1; i <= frames; i++) {
-      const padded = i.toString().padStart(4, "0");
-      const src = mobile
-        ? `/frames/frame_${padded}.jpg`
-        : `/frame/frame_${padded}.jpg`;
-
-      loadedImages.push(src);
-
-      // Preload logic
-      const img = new Image();
-      img.src = src;
-
-      const promise = new Promise<void>((resolve) => {
-        img.onload = () => resolve();
-        img.onerror = () => resolve(); // Failsafe
-      });
-
-      preloadPromises.push(promise);
-    }
-
-    Promise.all(preloadPromises).then(() => {
-      setImages(loadedImages);
-      setImagesLoaded(true);
-    });
+    setVideoSrc(mobile ? "/trial_optimized_mobile.mp4" : "/trial_optimized.mp4");
   }, []);
 
-  useGSAP(() => {
-    if (
-      !sectionRef.current ||
-      !imageRef.current ||
-      images.length === 0 ||
-      !imagesLoaded
-    )
-      return;
+  // Load video duration
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
 
-    // Animate headline fade-in
-    gsap.to(headRef.current, {
+    const handleLoadedMetadata = () => {
+      setVideoDuration(videoEl.duration || 1);
+    };
+
+    videoEl.addEventListener("loadedmetadata", handleLoadedMetadata);
+    return () => {
+      videoEl.removeEventListener("loadedmetadata", handleLoadedMetadata);
+    };
+  }, [videoSrc]);
+
+  useGSAP(() => {
+    const section = sectionRef.current;
+    const video = videoRef.current;
+    const head = headRef.current;
+    const overlay = overlayRef.current;
+    if (!section || !video || !head || !overlay) return;
+    if (videoDuration === 0) return;
+
+    // Animate headline opacity
+    gsap.to(head, {
       opacity: 1,
       duration: 3,
       scrollTrigger: {
-        trigger: sectionRef.current,
+        trigger: section,
         start: "top top",
         end: "bottom top",
         scrub: true,
       },
     });
 
-    // Animate zoom and border-radius
-    gsap.fromTo(
-      sectionRef.current,
-      {
-        scale: 0.9,
-        opacity: 0,
-        borderRadius: "50px",
-        transformOrigin: "top center",
-      },
-      {
-        scale: 1,
-        opacity: 1,
-        borderRadius: 0,
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top bottom",
-          end: "top top",
-          scrub: 1,
-        },
-      }
-    );
-
     // Animate overlay fade
-    gsap.to(jasonOpacityRef.current, {
+    gsap.to(overlay, {
       opacity: 0.4,
       duration: 3,
       scrollTrigger: {
-        trigger: sectionRef.current,
+        trigger: section,
         start: "top top",
         end: "bottom top",
         scrub: true,
       },
     });
 
-    // Scroll frame animation
-    const obj = { frame: 0 };
-    gsap.to(obj, {
-      frame: totalFrames - 1,
+    // Throttle updating video currentTime with requestAnimationFrame
+    const scrubObj = { t: 0 };
+    let rafId: number | null = null;
+
+    gsap.to(scrubObj, {
+      t: 1,
       ease: "none",
       scrollTrigger: {
-        trigger: sectionRef.current,
+        trigger: section,
         start: "top top",
         end: "bottom top",
         scrub: true,
-        pin: true,
+        pin: isMobile ? false : true, // disable pin on mobile for performance
       },
       onUpdate: () => {
-        const currentFrame = Math.round(obj.frame);
-        if (imageRef.current && images[currentFrame]) {
-          imageRef.current.src = images[currentFrame];
-        }
+        if (rafId) return;
+        rafId = requestAnimationFrame(() => {
+          rafId = null;
+          if (video && videoDuration > 0) {
+            video.currentTime = scrubObj.t * videoDuration;
+          }
+        });
       },
     });
-  }, [images, imagesLoaded]);
+  }, [videoDuration, isMobile]);
 
   return (
     <div
@@ -136,28 +103,34 @@ const Intro = () => {
     >
       {/* Overlay */}
       <div
-        ref={jasonOpacityRef}
-        className="absolute inset-0 bg-black opacity-0 z-10"
+        ref={overlayRef}
+        className="absolute inset-0 bg-black opacity-0 z-10 pointer-events-none"
       />
 
-      {/* Text */}
+      {/* Headline */}
       <h1
         ref={headRef}
-        className="absolute text-2xl lg:text-6xl font-extrabold z-20 top-8/10 lg:top-2/3 left-1/8 opacity-0 text-white leading-snug"
+        className="absolute text-2xl lg:text-6xl font-extrabold z-20 top-4/5 lg:top-2/3 left-1/8 opacity-0 text-white leading-snug"
       >
         &quot;If anything happens,
         <br />
         &nbsp; I&apos;ll run away before you.&quot;
       </h1>
 
-      {/* Initial Frame Image */}
-      <img
-        ref={imageRef}
-        src={
-          isMobile ? `/frames/frame_0001.jpg` : `/frame/frame_0001.jpg`
-        }
-        className="w-full h-full object-cover object-[60%_center] will-change-transform z-0"
-        alt="Scroll Animation"
+      {/* Video */}
+      <video
+        ref={videoRef}
+        src={videoSrc}
+        className="w-full h-full object-cover object-center will-change-auto z-0"
+        preload="auto"
+        playsInline
+        muted
+        style={{
+          pointerEvents: "none",
+          willChange: "transform",
+          transform: "translateZ(0)",
+          backfaceVisibility: "hidden",
+        }}
       />
     </div>
   );
